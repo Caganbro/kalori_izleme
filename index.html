@@ -10,7 +10,7 @@
 <title>Günlük Diyet Takibi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f6f4ee;
@@ -48,6 +48,20 @@ h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;margin:0;letter-spacing:-.
   background:var(--card);font-size:16px;color:var(--ink);cursor:pointer;display:grid;place-items:center
 }
 .daynav button:active{transform:scale(.92)}
+
+/* daily quote */
+.quote{
+  font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+  font-size:15px;line-height:1.5;color:var(--green);
+  border-left:3px solid var(--apricot);padding:2px 0 2px 12px;margin:10px 2px 2px;
+}
+.quote .qmark{color:var(--apricot);font-size:18px;font-weight:600}
+
+/* custom calorie row */
+.customrow{background:var(--bg)}
+.customrow .info .t{color:var(--ink)}
+.customrow .gramin{border-color:var(--apricot);background:var(--card)}
+.customrow .gramin input{width:62px}
 
 /* hero ring */
 .hero{
@@ -186,6 +200,8 @@ h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;margin:0;letter-spacing:-.
       <button class="gear" id="openSettings" aria-label="Ayarlar">⚙</button>
     </div>
   </div>
+
+  <div class="quote" id="dailyQuote"></div>
 
   <!-- HERO RING -->
   <div class="hero">
@@ -382,6 +398,70 @@ const CONFIG = {
   ],
 
   eggKcal: { boiled:75, fried:90 }, // haşlanmış / az yağda
+
+  // 60 günlük motivasyon sözleri (her gün biri gösterilir, sırayla döner)
+  quotes: [
+    "Damlaya damlaya göl olur.",
+    "Sabreden derviş muradına ermiş.",
+    "İşleyen demir ışıldar.",
+    "Azimle sıçan duvarı deler.",
+    "Bugünün işini yarına bırakma.",
+    "Emek olmadan yemek olmaz.",
+    "Sabır acıdır ama meyvesi tatlıdır.",
+    "Düşmeden yürümek öğrenilmez.",
+    "Disiplin, hedef ile başarı arasındaki köprüdür.",
+    "Bugün attığın küçük adım, yarının büyük farkıdır.",
+    "İrade bir kez değil, her gün verilen karardır.",
+    "Cefayı çeken sefayı sürer.",
+    "Zahmetsiz rahmet olmaz.",
+    "Yavaş giden yorulmaz.",
+    "Dağ ne kadar yüce olsa yol üstünden aşar.",
+    "Vazgeçmek, en kolay ve en çok pişman olunan karardır.",
+    "Hedefe giden yolda en büyük rakip, dünkü kendindir.",
+    "Küçük zaferler, büyük değişimin tuğlalarıdır.",
+    "Sözünü tuttuğun her gün kendine güvenin artar.",
+    "Bugün direnen, yarın gülen olur.",
+    "Mazeret üreten, sonuç üretemez.",
+    "Bugün seçtiğin zorluk, yarın seni özgür kılar.",
+    "Yolun uzunluğu değil, adımın sürekliliği önemlidir.",
+    "Kararlılık, yeteneğin eksiğini kapatır.",
+    "Ya yaparsın ya yapmazsın; gerisi bahanedir.",
+    "Bugün zor gelen, yarın alışkanlık olur.",
+    "Sabır, başarının sessiz ortağıdır.",
+    "Her büyük yol tek bir adımla başlar.",
+    "Pes etmek de bir alışkanlıktır, devam etmek de.",
+    "Kendine verdiğin söz, en kıymetli sözdür.",
+    "Rüzgâra değil, yelkenine bak.",
+    "Zorlukların ardında en güzel manzara saklıdır.",
+    "Bugünü kazan, gelecek kendini toplar.",
+    "Yapabileceğine inanan yarı yolu geçmiştir.",
+    "Az ama düzenli, çok ama düzensizden iyidir.",
+    "Demir tavında dövülür.",
+    "Gayretin varsa, bahanen olmaz.",
+    "Her sabah yeni bir başlangıçtır.",
+    "Bugünkü emek, yarınki gurur.",
+    "İstikrar, en sade ama en güçlü silahtır.",
+    "Zoru başaran, kolayı zaten yapar.",
+    "Vazgeçmeyen kaybetmez, sadece geç kazanır.",
+    "Kendini yenmek, en büyük zaferdir.",
+    "Bir günlük disiplin küçük, altmış günlük disiplin bir karakterdir.",
+    "Yolda kalmak, yola çıkmaktan daha çok cesaret ister.",
+    "Düzen olmadan hedef hayaldir.",
+    "Bugün verdiğin söze sadık kal, gerisi gelir.",
+    "Engel yolu kapatmaz, sadece kararlılığı ölçer.",
+    "Acele değil, süreklilik kazandırır.",
+    "En karanlık an, şafağa en yakın andır.",
+    "Adımların küçük olabilir ama yön doğruysa varırsın.",
+    "Bugünkü tercih, yarınki sen.",
+    "Sonuna kadar git; yarı yolda dönen manzarayı göremez.",
+    "Hedefi olan için yorgunluk geçici, vazgeçmek kalıcıdır.",
+    "Başlamak yarısıdır, sürdürmek tamamı.",
+    "Niyetin sağlamsa yol kendini açar.",
+    "Her gün biraz, bir ömür çok eder.",
+    "Kolay olsaydı herkes yapardı.",
+    "İnandığın yolda yalnız yürümek, kalabalıkla durmaktan iyidir.",
+    "Bugün bıraktığın yerden değil, dayandığın yerden tanınırsın.",
+  ],
 };
 
 /* ============================================================
@@ -399,11 +479,13 @@ if(!DB.days){ DB.days = {}; }
 
 let cursor = new Date(); // şu an gösterilen gün
 function dayKey(d){ return d.toISOString().slice(0,10); }
-function blankDay(){ return { steps:0, sport:null, sportMin:0, breakfast:{}, lunch:{}, dinner:{}, snack:null }; }
+function blankDay(){ return { steps:0, sport:null, sportMin:0, breakfast:{}, lunch:{}, dinner:{}, snack:null, custom:{breakfast:0,lunch:0,dinner:0,snack:0} }; }
 function curDay(){
   const k = dayKey(cursor);
   if(!DB.days[k]) DB.days[k] = blankDay();
-  return DB.days[k];
+  const d = DB.days[k];
+  if(!d.custom) d.custom = {breakfast:0,lunch:0,dinner:0,snack:0};
+  return d;
 }
 function persist(){ DB.profile = DB.profile; store.saveAll(DB); }
 
@@ -451,7 +533,8 @@ function sportKcal(day){
   if(!sp) return 0;
   return Math.round(sp.met * DB.profile.weight * (day.sportMin/60));
 }
-function dayIntake(day){ return breakfastKcal(day)+mainKcal(day.lunch)+mainKcal(day.dinner)+snackKcal(day); }
+function customTotal(day){ const c=day.custom||{}; return (c.breakfast||0)+(c.lunch||0)+(c.dinner||0)+(c.snack||0); }
+function dayIntake(day){ return breakfastKcal(day)+mainKcal(day.lunch)+mainKcal(day.dinner)+snackKcal(day)+customTotal(day); }
 function dayBurn(day){ return Math.round(bmr()*CONFIG.neatFactor) + stepKcal(day) + sportKcal(day); }
 function dayDeficit(day){ return dayBurn(day)-dayIntake(day); }
 
@@ -470,6 +553,21 @@ function fmtDate(d){
   const mon=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   const today = dayKey(d)===dayKey(new Date());
   return (today?"Bugün · ":"") + days[d.getDay()]+", "+d.getDate()+" "+mon[d.getMonth()];
+}
+
+function appendCustomRow(card, slotKey){
+  const day=curDay();
+  const val = day.custom?.[slotKey] || 0;
+  const row=ce("div","opt customrow");
+  row.innerHTML=`<div class="info"><div class="t">Diğer</div><div class="d">Plan dışı yenen — kalorisini gir</div></div>`;
+  const gi=ce("div","gramin");
+  const inp=ce("input"); inp.type="number"; inp.inputMode="numeric"; inp.placeholder="0"; inp.value=val||"";
+  const sp=ce("span"); sp.textContent="kcal";
+  inp.addEventListener("input",()=>{ const d=curDay(); d.custom[slotKey]=Math.max(0,parseInt(inp.value)||0); persist(); updateTotals(); });
+  inp.addEventListener("blur",()=>render());
+  gi.append(inp,sp);
+  row.appendChild(gi);
+  card.appendChild(row);
 }
 
 function buildBreakfast(){
@@ -525,7 +623,7 @@ function buildBreakfast(){
     }
     card.appendChild(det);
   });
-  $("#totBreakfast").textContent = breakfastKcal(day)+" kcal";
+  appendCustomRow(card,"breakfast");
 }
 
 function buildMains(slotName, cardId, totId){
@@ -561,7 +659,7 @@ function buildMains(slotName, cardId, totId){
     }
     card.appendChild(det);
   });
-  $(totId).textContent = mainKcal(sel)+" kcal";
+  appendCustomRow(card, slotName);
 }
 
 function buildSnack(){
@@ -576,7 +674,7 @@ function buildSnack(){
     row.onclick=()=>{ const d=curDay(); d.snack = (d.snack===s.id)? null : s.id; persist(); render(); };
     card.appendChild(row);
   });
-  $("#totSnack").textContent = snackKcal(day)+" kcal";
+  appendCustomRow(card,"snack");
 }
 
 function buildActivity(){
@@ -597,41 +695,52 @@ function buildActivity(){
   $("#actTot").textContent = (stepKcal(day)+sportKcal(day))+" kcal yakım";
 }
 
-function render(){
-  const day=curDay();
-  $("#hdrName").textContent = DB.profile.name ? DB.profile.name : "Diyet Takibi";
-  $("#hdrDate").textContent = fmtDate(cursor);
+function showQuote(){
+  const q = CONFIG.quotes;
+  if(!q || !q.length){ $("#dailyQuote").style.display="none"; return; }
+  const dayNum = Math.floor(Date.parse(dayKey(cursor))/86400000);
+  const idx = ((dayNum % q.length)+q.length)%q.length;
+  $("#dailyQuote").innerHTML = `<span class="qmark">“</span>${q[idx]}<span class="qmark">”</span>`;
+}
 
-  buildBreakfast();
-  buildMains("lunch","#lunchCard","#totLunch");
-  buildMains("dinner","#dinnerCard","#totDinner");
-  buildSnack();
-  buildActivity();
+function updateTotals(){
+  const day=curDay();
+  const c=day.custom||{};
+  // bölüm toplamları (custom dahil)
+  $("#totBreakfast").textContent = (breakfastKcal(day)+(c.breakfast||0))+" kcal";
+  $("#totLunch").textContent     = (mainKcal(day.lunch)+(c.lunch||0))+" kcal";
+  $("#totDinner").textContent    = (mainKcal(day.dinner)+(c.dinner||0))+" kcal";
+  $("#totSnack").textContent     = (snackKcal(day)+(c.snack||0))+" kcal";
 
   const intake=dayIntake(day), burn=dayBurn(day), def=burn-intake;
   $("#intakeV").textContent=intake;
   $("#burnV").textContent=burn;
 
-  // ring: hedef açığa göre dolum
   const need=neededDeficit();
-  const ratio = Math.max(-1, Math.min(1, def/Math.max(need, 200)));
   const C=540;
-  $("#ring").style.strokeDashoffset = C - C*Math.abs(ratio)*0.999;
-  $("#ring").setAttribute("stroke", def>=0 ? "var(--green)" : "var(--red)");
-  const dn=$("#defNum"); dn.textContent=(def>=0?"+":"")+def;
-  dn.className="big "+(def>=0?"pos":"neg");
-  $(".unit").textContent = def>=0?"kcal açık":"kcal fazla";
-
-  // verdict
+  const dn=$("#defNum");
   let v="";
-  if(intake===0 && burn===Math.round(bmr()*CONFIG.neatFactor)){ v="Bugün için henüz giriş yok"; }
-  else if(def>=need){ v="🎯 Hedef açığı yakalandı, harika gidiyor"; }
-  else if(def>=need*0.6){ v="İyi, hedefe yakınsın"; }
-  else if(def>=0){ v="Açıktasın ama hedefin altında"; }
-  else { v="Bugün fazla — yarın telafi"; }
+  if(intake===0){
+    $("#ring").style.strokeDashoffset = C;
+    $("#ring").setAttribute("stroke", "var(--line)");
+    dn.textContent="—"; dn.className="big"; dn.style.color="var(--muted)";
+    $(".unit").textContent="yemek bekleniyor";
+    v="Henüz yemek girilmedi";
+  } else {
+    dn.style.color="";
+    const ratio = Math.max(-1, Math.min(1, def/Math.max(need, 200)));
+    $("#ring").style.strokeDashoffset = C - C*Math.abs(ratio)*0.999;
+    $("#ring").setAttribute("stroke", def>=0 ? "var(--green)" : "var(--red)");
+    dn.textContent=(def>=0?"+":"")+def;
+    dn.className="big "+(def>=0?"pos":"neg");
+    $(".unit").textContent = def>=0?"kcal açık":"kcal fazla";
+    if(def>=need){ v="🎯 Hedef açığı yakalandı, harika gidiyor"; }
+    else if(def>=need*0.6){ v="İyi, hedefe yakınsın"; }
+    else if(def>=0){ v="Açıktasın ama hedefin altında"; }
+    else { v="Bugün fazla — yarın telafi"; }
+  }
   $("#verdict").textContent=v;
 
-  // balance bar
   const mx=Math.max(intake,burn,1);
   $("#barIn").style.width=(intake/mx*100)+"%";
   $("#barBurn").style.width=((burn-intake>0?(burn-intake):0)/mx*100)+"%";
@@ -639,20 +748,20 @@ function render(){
   // goal / cumulative
   const keys=Object.keys(DB.days).sort();
   let sumDef=0, n=0;
-  keys.forEach(k=>{ const dd=DB.days[k]; const di=dayIntake(dd); if(di>0||dd.steps>0||dd.sport){ sumDef+=dayDeficit(dd); n++; } });
+  keys.forEach(k=>{ const dd=DB.days[k]; if(dayIntake(dd)>0){ sumDef+=dayDeficit(dd); n++; } });
   const lostKg = sumDef/CONFIG.kcalPerKg;
   const pct=Math.max(0,Math.min(100, lostKg/DB.profile.goalKg*100));
   $("#track").style.width=pct+"%";
   $("#lostKg").textContent = lostKg.toFixed(2)+" kg verildi";
   $("#goalKg").textContent = DB.profile.goalKg+" kg";
   $("#goalSub").textContent = `${DB.profile.goalDays} günde ${DB.profile.goalKg} kg — günde ~${need} kcal açık gerekir`;
-  $("#stToday").textContent=(def>=0?"+":"")+def;
+  $("#stToday").textContent= intake===0 ? "—" : (def>=0?"+":"")+def;
   $("#stAvg").textContent= n? Math.round(sumDef/n) : 0;
   $("#stDays").textContent=n;
 
   // history
   const hc=$("#histCard"); hc.innerHTML="";
-  const recent=keys.slice().reverse().slice(0,10).filter(k=>{const dd=DB.days[k];return dayIntake(dd)>0||dd.steps>0||dd.sport;});
+  const recent=keys.slice().reverse().slice(0,10).filter(k=>dayIntake(DB.days[k])>0);
   if(recent.length===0){ hc.innerHTML='<div class="hd"><span style="color:var(--muted)">Henüz kayıt yok</span></div>'; }
   else recent.forEach(k=>{
     const dd=DB.days[k]; const di=dayDeficit(dd);
@@ -664,6 +773,20 @@ function render(){
   });
 
   persist();
+}
+
+function render(){
+  $("#hdrName").textContent = DB.profile.name ? DB.profile.name : "Diyet Takibi";
+  $("#hdrDate").textContent = fmtDate(cursor);
+  showQuote();
+
+  buildBreakfast();
+  buildMains("lunch","#lunchCard","#totLunch");
+  buildMains("dinner","#dinnerCard","#totDinner");
+  buildSnack();
+  buildActivity();
+
+  updateTotals();
 }
 
 /* ---------- EVENTS ---------- */
