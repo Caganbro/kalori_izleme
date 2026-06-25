@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f6f4ee">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Diyet">
+<title>Günlük Diyet Takibi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ee;
+  --card:#fffdf9;
+  --ink:#23271f;
+  --muted:#7c8275;
+  --line:#e7e3d8;
+  --green:#3f7d4e;
+  --green-soft:#e8f1e6;
+  --apricot:#e8884b;
+  --apricot-soft:#fbe9da;
+  --red:#c0563f;
+  --shadow:0 1px 2px rgba(35,39,31,.04),0 8px 24px rgba(35,39,31,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:Inter,-apple-system,system-ui,sans-serif;
+  font-size:16px;line-height:1.45;
+  padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 24px);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px}
+h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;margin:0;letter-spacing:-.01em}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 6px}
+.top .name{font-family:"Bricolage Grotesque";font-weight:700;font-size:20px}
+.top .date{font-size:13px;color:var(--muted);font-weight:500}
+.daynav{display:flex;align-items:center;gap:6px}
+.daynav button{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:var(--card);font-size:16px;color:var(--ink);cursor:pointer;display:grid;place-items:center
+}
+.daynav button:active{transform:scale(.92)}
+
+/* hero ring */
+.hero{
+  background:var(--card);border:1px solid var(--line);border-radius:24px;
+  padding:22px 20px 20px;box-shadow:var(--shadow);margin-top:6px;text-align:center
+}
+.ring-wrap{position:relative;width:200px;height:200px;margin:2px auto 4px}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-center .big{font-family:"Bricolage Grotesque";font-weight:800;font-size:46px;line-height:1;letter-spacing:-.03em}
+.ring-center .big.pos{color:var(--green)}
+.ring-center .big.neg{color:var(--red)}
+.ring-center .unit{font-size:13px;color:var(--muted);margin-top:3px;font-weight:600}
+.ring-center .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:8px;font-weight:600}
+.hero .verdict{font-size:13.5px;color:var(--muted);margin-top:6px;font-weight:500;min-height:18px}
+
+/* balance bar */
+.balance{display:flex;gap:14px;margin-top:16px}
+.balance .col{flex:1;text-align:left}
+.balance .col .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.balance .col .v{font-family:"Bricolage Grotesque";font-weight:700;font-size:22px;margin-top:1px}
+.balance .col.intake .v{color:var(--apricot)}
+.balance .col.burn .v{color:var(--green)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:12px;display:flex}
+.bar .fill-in{background:var(--apricot)}
+.bar .fill-burn{background:var(--green-soft)}
+
+/* sections */
+.sec{margin-top:22px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 10px}
+.sec-head h2{font-size:15px;font-weight:700}
+.sec-head .tot{font-size:13px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+
+/* meal option list */
+.opt{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;cursor:pointer}
+.opt:last-child{border-bottom:none}
+.opt .check{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:none;display:grid;place-items:center;transition:.15s}
+.opt.on .check{background:var(--green);border-color:var(--green)}
+.opt .check svg{width:13px;height:13px;opacity:0;transition:.15s}
+.opt.on .check svg{opacity:1}
+.opt .info{flex:1;min-width:0}
+.opt .info .t{font-weight:600;font-size:14.5px}
+.opt .info .d{font-size:12.5px;color:var(--muted);margin-top:1px}
+.opt .kc{font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;flex:none}
+.opt.on{background:var(--green-soft)}
+
+/* detail editor (revealed when selected) */
+.detail{padding:4px 16px 14px;background:var(--green-soft);border-bottom:1px solid var(--line);display:none}
+.opt.on + .detail{display:block}
+.row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px dashed rgba(63,125,78,.18)}
+.row:last-child{border-bottom:none}
+.row .rl{font-size:13.5px;font-weight:500}
+.row .rl small{display:block;color:var(--muted);font-size:11.5px;font-weight:500}
+.stepper{display:flex;align-items:center;gap:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper button{width:34px;height:34px;border:none;background:transparent;font-size:18px;color:var(--green);cursor:pointer}
+.stepper button:active{background:var(--green-soft)}
+.stepper input{width:46px;border:none;text-align:center;font-size:14px;font-weight:600;background:transparent;font-variant-numeric:tabular-nums;color:var(--ink);-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.gramin{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 4px 0 10px}
+.gramin input{width:54px;border:none;text-align:right;font-size:15px;font-weight:600;background:transparent;font-variant-numeric:tabular-nums;color:var(--ink);height:36px;-moz-appearance:textfield}
+.gramin input::-webkit-outer-spin-button,.gramin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.gramin span{font-size:12px;color:var(--muted);font-weight:600}
+.toggle{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.toggle button{border:none;background:transparent;padding:8px 12px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.toggle button.on{background:var(--green);color:#fff}
+
+/* activity */
+.act .ablock{padding:14px 16px;border-bottom:1px solid var(--line)}
+.act .ablock:last-child{border-bottom:none}
+.act .albl{font-size:13.5px;font-weight:600;margin-bottom:9px;display:flex;justify-content:space-between}
+.act .albl span{color:var(--green);font-variant-numeric:tabular-nums}
+.bigin{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:2px 12px}
+.bigin input{flex:1;border:none;background:transparent;font-size:18px;font-weight:700;height:42px;color:var(--ink);font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.bigin input::-webkit-outer-spin-button,.bigin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.bigin .suf{font-size:13px;color:var(--muted);font-weight:600}
+.sportypes{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.chip.on{background:var(--apricot);border-color:var(--apricot);color:#fff}
+.sportime{display:none;margin-top:10px}
+.sportime.show{display:block}
+
+/* summary / goal */
+.goal{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:18px;margin-top:22px}
+.goal h2{font-size:15px;font-weight:700;margin-bottom:4px}
+.goal .sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.track{height:14px;border-radius:99px;background:var(--green-soft);overflow:hidden;position:relative}
+.track .tfill{height:100%;background:linear-gradient(90deg,#5aa86b,#3f7d4e);border-radius:99px;transition:width .5s ease;min-width:2px}
+.track .tgt{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--apricot)}
+.goal .legend{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted);font-weight:500}
+.goal .stats{display:flex;gap:12px;margin-top:16px;text-align:center}
+.goal .stats .st{flex:1;background:var(--bg);border-radius:14px;padding:11px 6px}
+.goal .stats .st .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.goal .stats .st .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-top:2px}
+
+/* history */
+.hist{margin-top:10px}
+.hist .hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.hist .hd:last-child{border-bottom:none}
+.hist .hd .hdate{font-weight:600}
+.hist .hd .hdate small{color:var(--muted);font-weight:500;font-size:11.5px}
+.hist .hd .hdef{font-weight:700;font-variant-numeric:tabular-nums}
+.hist .hd .hdef.pos{color:var(--green)}
+.hist .hd .hdef.neg{color:var(--red)}
+
+.foot{text-align:center;color:var(--muted);font-size:11.5px;margin-top:24px;line-height:1.6}
+.foot a{color:var(--green)}
+
+/* settings sheet */
+.gear{background:none;border:none;font-size:19px;cursor:pointer;color:var(--muted);padding:4px}
+.sheet{position:fixed;inset:0;background:rgba(35,39,31,.4);display:none;align-items:flex-end;z-index:50}
+.sheet.show{display:flex}
+.sheet .panel{background:var(--card);width:100%;max-width:480px;margin:0 auto;border-radius:24px 24px 0 0;padding:20px 18px calc(env(safe-area-inset-bottom) + 22px);max-height:88vh;overflow:auto}
+.sheet h2{font-size:18px;margin-bottom:14px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 12px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--ink)}
+.field.two{display:flex;gap:10px}
+.field.two > div{flex:1}
+.btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:13px;padding:14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px}
+.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line);margin-top:9px}
+.note{font-size:11.5px;color:var(--muted);background:var(--apricot-soft);border-radius:10px;padding:10px 12px;margin-top:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="name" id="hdrName">Diyet Takibi</div>
+      <div class="date" id="hdrDate">—</div>
+    </div>
+    <div class="daynav">
+      <button id="prevDay" aria-label="Önceki gün">‹</button>
+      <button id="nextDay" aria-label="Sonraki gün">›</button>
+      <button class="gear" id="openSettings" aria-label="Ayarlar">⚙</button>
+    </div>
+  </div>
+
+  <!-- HERO RING -->
+  <div class="hero">
+    <div class="ring-wrap">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="86" fill="none" stroke="var(--line)" stroke-width="16"/>
+        <circle id="ring" cx="100" cy="100" r="86" fill="none" stroke="var(--green)" stroke-width="16"
+                stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="540"/>
+      </svg>
+      <div class="ring-center">
+        <div class="big pos" id="defNum">0</div>
+        <div class="unit">kcal açık</div>
+        <div class="lbl" id="defLbl">bugünkü denge</div>
+      </div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+    <div class="balance">
+      <div class="col intake">
+        <div class="k">Alınan</div>
+        <div class="v num"><span id="intakeV">0</span></div>
+      </div>
+      <div class="col burn" style="text-align:right">
+        <div class="k">Yakılan</div>
+        <div class="v num"><span id="burnV">0</span></div>
+      </div>
+    </div>
+    <div class="bar"><div class="fill-in" id="barIn" style="width:50%"></div><div class="fill-burn" id="barBurn" style="width:50%"></div></div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div class="sec">
+    <div class="sec-head"><h2>Hareket</h2><span class="tot num" id="actTot">0 kcal yakım</span></div>
+    <div class="card act">
+      <div class="ablock">
+        <div class="albl">Bugün atılan adım <span class="num" id="stepKc">+0 kcal</span></div>
+        <div class="bigin">
+          <input type="number" inputmode="numeric" id="steps" placeholder="0" min="0">
+          <span class="suf">adım</span>
+        </div>
+      </div>
+      <div class="ablock">
+        <div class="albl">Spor yaptı mı? <span class="num" id="sportKc">+0 kcal</span></div>
+        <div class="sportypes" id="sportChips"></div>
+        <div class="sportime" id="sportTime">
+          <div class="bigin">
+            <input type="number" inputmode="numeric" id="sportMin" placeholder="0" min="0">
+            <span class="suf">dakika</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEALS -->
+  <div class="sec">
+    <div class="sec-head"><h2>Kahvaltı</h2><span class="tot num" id="totBreakfast">0 kcal</span></div>
+    <div class="card" id="breakfastCard"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Öğle</h2><span class="tot num" id="totLunch">0 kcal</span></div>
+    <div class="card" id="lunchCard"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Ara öğün <small style="font-weight:500;color:var(--muted)">· günde 1</small></h2><span class="tot num" id="totSnack">0 kcal</span></div>
+    <div class="card" id="snackCard"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Akşam</h2><span class="tot num" id="totDinner">0 kcal</span></div>
+    <div class="card" id="dinnerCard"></div>
+  </div>
+
+  <!-- GOAL -->
+  <div class="goal">
+    <h2>Hedef: 5 kg</h2>
+    <div class="sub" id="goalSub">2 ayda 5 kg — günde ~640 kcal açık gerekir</div>
+    <div class="track"><div class="tfill" id="track" style="width:0%"></div><div class="tgt" id="trackTgt" style="left:100%"></div></div>
+    <div class="legend"><span id="lostKg">0 kg verildi</span><span id="goalKg">5 kg</span></div>
+    <div class="stats">
+      <div class="st"><div class="v num" id="stToday">0</div><div class="l">Bugünkü açık</div></div>
+      <div class="st"><div class="v num" id="stAvg">0</div><div class="l">Ort. açık</div></div>
+      <div class="st"><div class="v num" id="stDays">0</div><div class="l">Takip günü</div></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="sec">
+    <div class="sec-head"><h2>Geçmiş</h2></div>
+    <div class="card hist" id="histCard"><div class="hd"><span style="color:var(--muted)">Henüz kayıt yok</span></div></div>
+  </div>
+
+  <div class="foot">
+    Veriler şimdilik yalnızca bu cihazda saklanıyor.<br>
+    Sabitler ve menüler kodun başındaki <b>CONFIG</b> bloğundan düzenlenebilir.
+  </div>
+</div>
+
+<!-- SETTINGS SHEET -->
+<div class="sheet" id="settingsSheet">
+  <div class="panel">
+    <h2>Ayarlar</h2>
+    <div class="field"><label>İsim</label><input id="setName" placeholder="Arkadaşının adı"></div>
+    <div class="field two">
+      <div><label>Kilo (kg)</label><input type="number" id="setWeight" step="0.1"></div>
+      <div><label>Boy (cm)</label><input type="number" id="setHeight"></div>
+    </div>
+    <div class="field two">
+      <div><label>Yaş</label><input type="number" id="setAge"></div>
+      <div><label>Cinsiyet</label><select id="setSex"><option value="f">Kadın</option><option value="m">Erkek</option></select></div>
+    </div>
+    <div class="field two">
+      <div><label>Hedef (kg verme)</label><input type="number" id="setGoal" step="0.1"></div>
+      <div><label>Süre (gün)</label><input type="number" id="setDays"></div>
+    </div>
+    <div class="note" id="bmrNote"></div>
+    <button class="btn" id="saveSettings">Kaydet</button>
+    <button class="btn ghost" id="resetDay">Bu günün kayıtlarını sıfırla</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — tüm sabitler ve menüler burada. İstediğini düzenle.
+   ============================================================ */
+const CONFIG = {
+  profile: { name:"", weight:65.5, height:165, age:23, sex:"f", goalKg:5, goalDays:60 },
+
+  // hesap sabitleri
+  neatFactor: 1.10,        // BMR çarpanı (temel günlük hareket)
+  kcalPerStepFactor: 0.0005, // adım kalorisi = adım × kilo × bu sayı
+  kcalPerKg: 7700,         // 1 kg yağ ~ 7700 kcal
+
+  // spor türleri (MET değeri). kcal = MET × kilo × saat
+  sports: [
+    {id:"walk", name:"Tempolu yürüyüş", met:4.3},
+    {id:"run",  name:"Koşu",            met:8.0},
+    {id:"bike", name:"Bisiklet",        met:6.0},
+    {id:"pilates", name:"Pilates / yoga", met:3.0},
+    {id:"weights", name:"Ağırlık",      met:5.0},
+    {id:"hiit", name:"HIIT",            met:8.0},
+  ],
+
+  // KAHVALTI: bileşen bazlı (adet/gram girilir, kcal canlı hesaplanır)
+  breakfast: [
+    { id:"bf1", name:"Yumurtalı kahvaltı",
+      components:[
+        {id:"egg", label:"Yumurta", kind:"egg", def:2},
+        {id:"bread", label:"Ekmek dilimi", kcal:80, unit:"dilim", def:1},
+        {id:"cheese", label:"Peynir (~30g)", kcal:85, unit:"porsiyon", def:1},
+        {id:"olive", label:"Zeytin", kcal:7, unit:"adet", def:5},
+      ]},
+    { id:"bf2", name:"Haşlanmış yumurta",
+      components:[
+        {id:"egg", label:"Yumurta", kind:"egg", def:3, forceBoiled:true},
+        {id:"bread", label:"Ekmek dilimi", kcal:80, unit:"dilim", def:1},
+        {id:"veg", label:"Domates/salatalık", kcal:25, unit:"porsiyon", def:1},
+      ]},
+    { id:"bf3", name:"Proteinli smoothie",
+      components:[
+        {id:"protein", label:"Protein tozu", kcal:120, unit:"ölçek", def:1},
+        {id:"milk", label:"Yarım yağlı süt", kcalPer:0.46, unit:"ml", def:225, step:25},
+        {id:"banana", label:"Muz", kcal:90, unit:"adet", def:1, frac:true},
+        {id:"straw", label:"Çilek", kcalPer:0.33, unit:"g", def:100, step:25},
+        {id:"oat", label:"Yulaf", kcalPer:3.8, unit:"g", def:25, step:5},
+      ]},
+  ],
+
+  // ÖĞLE / AKŞAM: gram girilir, kcal/g ile ölçeklenir (+sabit bileşenler)
+  mains: [
+    { id:"m1", name:"Tavuklu burrito", fixed:260, fixedNote:"tortilla + sebze + sprey yağ",
+      gram:{label:"Tavuk göğsü", kcalPerG:1.65, def:150} },
+    { id:"m2", name:"Köfteli burrito", fixed:250, fixedNote:"tortilla + sebze",
+      gram:{label:"Köfte", kcalPerG:2.4, def:130} },
+    { id:"m3", name:"Haşlanmış tavuk + pilav", fixed:25, fixedNote:"salata",
+      gram:{label:"Tavuk + pilav (toplam)", kcalPerG:1.45, def:300} },
+    { id:"m4", name:"Fırında tavuk + patates", fixed:25, fixedNote:"sebze",
+      gram:{label:"Tavuk + patates (toplam)", kcalPerG:1.25, def:350} },
+  ],
+
+  // ARA ÖĞÜN: sabit kcal, biri seçilir
+  snacks: [
+    {id:"s1", name:"Sade yoğurt (200g)", kcal:125},
+    {id:"s2", name:"Yoğurt + 100g çilek", kcal:155},
+    {id:"s3", name:"Yoğurt + 20g yulaf", kcal:200},
+    {id:"s4", name:"1 elma + 10 badem", kcal:160},
+    {id:"s5", name:"1 küçük muz", kcal:90},
+    {id:"s6", name:"200 ml kefir", kcal:115},
+    {id:"s7", name:"1 haşlanmış yumurta", kcal:75},
+    {id:"s8", name:"Protein tozu (suyla)", kcal:120},
+    {id:"s9", name:"20g bitter çikolata", kcal:112},
+    {id:"s10", name:"1 meyve + 150g yoğurt", kcal:175},
+  ],
+
+  eggKcal: { boiled:75, fried:90 }, // haşlanmış / az yağda
+};
+
+/* ============================================================
+   STORAGE — şimdilik localStorage. (Supabase'e geçişte yalnızca
+   bu iki fonksiyon değişecek: loadAll / saveDay)
+   ============================================================ */
+const store = {
+  loadAll(){ try{ return JSON.parse(localStorage.getItem("diyet_v1")||"{}"); }catch(e){ return {}; } },
+  saveAll(data){ localStorage.setItem("diyet_v1", JSON.stringify(data)); },
+};
+
+let DB = store.loadAll();
+if(!DB.profile){ DB.profile = {...CONFIG.profile}; }
+if(!DB.days){ DB.days = {}; }
+
+let cursor = new Date(); // şu an gösterilen gün
+function dayKey(d){ return d.toISOString().slice(0,10); }
+function blankDay(){ return { steps:0, sport:null, sportMin:0, breakfast:{}, lunch:{}, dinner:{}, snack:null }; }
+function curDay(){
+  const k = dayKey(cursor);
+  if(!DB.days[k]) DB.days[k] = blankDay();
+  return DB.days[k];
+}
+function persist(){ DB.profile = DB.profile; store.saveAll(DB); }
+
+/* ---------- HESAP MOTORU ---------- */
+function bmr(){
+  const p = DB.profile;
+  const base = 10*p.weight + 6.25*p.height - 5*p.age;
+  return p.sex==="m" ? base+5 : base-161;
+}
+function eggKcal(d){ return CONFIG.eggKcal[ d.eggFried ? "fried":"boiled" ]; }
+
+function breakfastKcal(day){
+  let t=0;
+  for(const opt of CONFIG.breakfast){
+    const sel = day.breakfast[opt.id];
+    if(!sel || !sel.on) continue;
+    for(const c of opt.components){
+      const q = sel.q?.[c.id] ?? c.def;
+      if(c.kind==="egg"){
+        const fried = c.forceBoiled ? false : (sel.eggFried||false);
+        t += q * (fried ? CONFIG.eggKcal.fried : CONFIG.eggKcal.boiled);
+      } else if(c.kcalPer){ t += q * c.kcalPer; }
+      else { t += q * c.kcal; }
+    }
+  }
+  return Math.round(t);
+}
+function mainKcal(slot){
+  const sel = slot;
+  if(!sel || !sel.id) return 0;
+  const m = CONFIG.mains.find(x=>x.id===sel.id);
+  if(!m) return 0;
+  const g = sel.g ?? m.gram.def;
+  return Math.round(m.fixed + g*m.gram.kcalPerG);
+}
+function snackKcal(day){
+  if(!day.snack) return 0;
+  const s = CONFIG.snacks.find(x=>x.id===day.snack);
+  return s? s.kcal : 0;
+}
+function stepKcal(day){ return Math.round((day.steps||0) * DB.profile.weight * CONFIG.kcalPerStepFactor); }
+function sportKcal(day){
+  if(!day.sport || !day.sportMin) return 0;
+  const sp = CONFIG.sports.find(x=>x.id===day.sport);
+  if(!sp) return 0;
+  return Math.round(sp.met * DB.profile.weight * (day.sportMin/60));
+}
+function dayIntake(day){ return breakfastKcal(day)+mainKcal(day.lunch)+mainKcal(day.dinner)+snackKcal(day); }
+function dayBurn(day){ return Math.round(bmr()*CONFIG.neatFactor) + stepKcal(day) + sportKcal(day); }
+function dayDeficit(day){ return dayBurn(day)-dayIntake(day); }
+
+function neededDeficit(){
+  const p=DB.profile;
+  return Math.round(p.goalKg*CONFIG.kcalPerKg/p.goalDays);
+}
+
+/* ---------- RENDER ---------- */
+const $ = s=>document.querySelector(s);
+const ce = (t,c)=>{const e=document.createElement(t); if(c)e.className=c; return e;};
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function fmtDate(d){
+  const days=["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+  const mon=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  const today = dayKey(d)===dayKey(new Date());
+  return (today?"Bugün · ":"") + days[d.getDay()]+", "+d.getDate()+" "+mon[d.getMonth()];
+}
+
+function buildBreakfast(){
+  const card=$("#breakfastCard"); card.innerHTML="";
+  const day=curDay();
+  CONFIG.breakfast.forEach(opt=>{
+    const sel = day.breakfast[opt.id] || {on:false};
+    const row=ce("div","opt"+(sel.on?" on":""));
+    let kc=0;
+    if(sel.on){ const tmp={breakfast:{[opt.id]:sel}}; kc=breakfastKcal(tmp); }
+    row.innerHTML=`<div class="check">${CHECK}</div>
+      <div class="info"><div class="t">${opt.name}</div><div class="d">${opt.components.map(c=>c.label).join(" · ")}</div></div>
+      <div class="kc">${sel.on?kc:""}</div>`;
+    row.onclick=(e)=>{ if(e.target.closest(".detail"))return;
+      const d=curDay(); const s=d.breakfast[opt.id]||{on:false,q:{}};
+      s.on=!s.on; d.breakfast[opt.id]=s; persist(); render(); };
+    card.appendChild(row);
+
+    const det=ce("div","detail");
+    if(sel.on){
+      opt.components.forEach(c=>{
+        const q = sel.q?.[c.id] ?? c.def;
+        const r=ce("div","row");
+        const left=ce("div","rl"); left.textContent=c.label;
+        if(c.kind==="egg" && !c.forceBoiled){
+          const small=ce("small"); small.textContent = (sel.eggFried?"az yağda":"haşlanmış");
+          left.appendChild(small);
+        }
+        r.appendChild(left);
+
+        const right=ce("div"); right.style.display="flex"; right.style.gap="8px"; right.style.alignItems="center";
+        if(c.kind==="egg" && !c.forceBoiled){
+          const tg=ce("div","toggle");
+          const b1=ce("button"); b1.textContent="Haşl."; if(!sel.eggFried)b1.className="on";
+          const b2=ce("button"); b2.textContent="Yağlı"; if(sel.eggFried)b2.className="on";
+          b1.onclick=()=>{ const d=curDay(); d.breakfast[opt.id].eggFried=false; persist(); render(); };
+          b2.onclick=()=>{ const d=curDay(); d.breakfast[opt.id].eggFried=true; persist(); render(); };
+          tg.append(b1,b2); right.appendChild(tg);
+        }
+        const step = c.step||1;
+        const stp=ce("div","stepper");
+        const minus=ce("button"); minus.textContent="−";
+        const inp=ce("input"); inp.type="number"; inp.value=q; inp.inputMode="numeric";
+        const plus=ce("button"); plus.textContent="+";
+        const setQ=(v)=>{ v=Math.max(0,v); const d=curDay(); const s=d.breakfast[opt.id]; s.q=s.q||{}; s.q[c.id]=v; persist(); render(); };
+        minus.onclick=()=>setQ((sel.q?.[c.id]??c.def)-step);
+        plus.onclick=()=>setQ((sel.q?.[c.id]??c.def)+step);
+        inp.onchange=()=>setQ(parseFloat(inp.value)||0);
+        stp.append(minus,inp,plus); right.appendChild(stp);
+        r.appendChild(right);
+        det.appendChild(r);
+      });
+    }
+    card.appendChild(det);
+  });
+  $("#totBreakfast").textContent = breakfastKcal(day)+" kcal";
+}
+
+function buildMains(slotName, cardId, totId){
+  const card=$(cardId); card.innerHTML="";
+  const day=curDay();
+  const sel = day[slotName] || {};
+  CONFIG.mains.forEach(m=>{
+    const on = sel.id===m.id;
+    const row=ce("div","opt"+(on?" on":""));
+    const kc = on? mainKcal(sel) : (m.fixed+m.gram.def*m.gram.kcalPerG);
+    row.innerHTML=`<div class="check">${CHECK}</div>
+      <div class="info"><div class="t">${m.name}</div><div class="d">${m.fixedNote}</div></div>
+      <div class="kc">${on?mainKcal(sel):Math.round(kc)}</div>`;
+    row.onclick=(e)=>{ if(e.target.closest(".detail"))return;
+      const d=curDay();
+      if(d[slotName]?.id===m.id){ d[slotName]={}; } else { d[slotName]={id:m.id, g:m.gram.def}; }
+      persist(); render(); };
+    card.appendChild(row);
+
+    const det=ce("div","detail");
+    if(on){
+      const r=ce("div","row");
+      const left=ce("div","rl"); left.textContent=m.gram.label;
+      const small=ce("small"); small.textContent=`${m.gram.kcalPerG} kcal/g + ${m.fixed} sabit`;
+      left.appendChild(small);
+      const gi=ce("div","gramin");
+      const gin=ce("input"); gin.type="number"; gin.inputMode="numeric"; gin.value=sel.g??m.gram.def;
+      const gs=ce("span"); gs.textContent="g";
+      gin.onchange=()=>{ const d=curDay(); d[slotName].g=Math.max(0,parseFloat(gin.value)||0); persist(); render(); };
+      gi.append(gin,gs);
+      r.append(left,gi);
+      det.appendChild(r);
+    }
+    card.appendChild(det);
+  });
+  $(totId).textContent = mainKcal(sel)+" kcal";
+}
+
+function buildSnack(){
+  const card=$("#snackCard"); card.innerHTML="";
+  const day=curDay();
+  CONFIG.snacks.forEach(s=>{
+    const on=day.snack===s.id;
+    const row=ce("div","opt"+(on?" on":""));
+    row.innerHTML=`<div class="check">${CHECK}</div>
+      <div class="info"><div class="t">${s.name}</div></div>
+      <div class="kc">${s.kcal}</div>`;
+    row.onclick=()=>{ const d=curDay(); d.snack = (d.snack===s.id)? null : s.id; persist(); render(); };
+    card.appendChild(row);
+  });
+  $("#totSnack").textContent = snackKcal(day)+" kcal";
+}
+
+function buildActivity(){
+  const day=curDay();
+  $("#steps").value = day.steps||"";
+  $("#stepKc").textContent = "+"+stepKcal(day)+" kcal";
+  const chips=$("#sportChips"); chips.innerHTML="";
+  CONFIG.sports.forEach(sp=>{
+    const c=ce("div","chip"+(day.sport===sp.id?" on":""));
+    c.textContent=sp.name;
+    c.onclick=()=>{ const d=curDay(); d.sport = (d.sport===sp.id)? null : sp.id; if(!d.sport)d.sportMin=0; persist(); render(); };
+    chips.appendChild(c);
+  });
+  const st=$("#sportTime");
+  if(day.sport){ st.classList.add("show"); } else { st.classList.remove("show"); }
+  $("#sportMin").value = day.sportMin||"";
+  $("#sportKc").textContent = "+"+sportKcal(day)+" kcal";
+  $("#actTot").textContent = (stepKcal(day)+sportKcal(day))+" kcal yakım";
+}
+
+function render(){
+  const day=curDay();
+  $("#hdrName").textContent = DB.profile.name ? DB.profile.name : "Diyet Takibi";
+  $("#hdrDate").textContent = fmtDate(cursor);
+
+  buildBreakfast();
+  buildMains("lunch","#lunchCard","#totLunch");
+  buildMains("dinner","#dinnerCard","#totDinner");
+  buildSnack();
+  buildActivity();
+
+  const intake=dayIntake(day), burn=dayBurn(day), def=burn-intake;
+  $("#intakeV").textContent=intake;
+  $("#burnV").textContent=burn;
+
+  // ring: hedef açığa göre dolum
+  const need=neededDeficit();
+  const ratio = Math.max(-1, Math.min(1, def/Math.max(need, 200)));
+  const C=540;
+  $("#ring").style.strokeDashoffset = C - C*Math.abs(ratio)*0.999;
+  $("#ring").setAttribute("stroke", def>=0 ? "var(--green)" : "var(--red)");
+  const dn=$("#defNum"); dn.textContent=(def>=0?"+":"")+def;
+  dn.className="big "+(def>=0?"pos":"neg");
+  $(".unit").textContent = def>=0?"kcal açık":"kcal fazla";
+
+  // verdict
+  let v="";
+  if(intake===0 && burn===Math.round(bmr()*CONFIG.neatFactor)){ v="Bugün için henüz giriş yok"; }
+  else if(def>=need){ v="🎯 Hedef açığı yakalandı, harika gidiyor"; }
+  else if(def>=need*0.6){ v="İyi, hedefe yakınsın"; }
+  else if(def>=0){ v="Açıktasın ama hedefin altında"; }
+  else { v="Bugün fazla — yarın telafi"; }
+  $("#verdict").textContent=v;
+
+  // balance bar
+  const mx=Math.max(intake,burn,1);
+  $("#barIn").style.width=(intake/mx*100)+"%";
+  $("#barBurn").style.width=((burn-intake>0?(burn-intake):0)/mx*100)+"%";
+
+  // goal / cumulative
+  const keys=Object.keys(DB.days).sort();
+  let sumDef=0, n=0;
+  keys.forEach(k=>{ const dd=DB.days[k]; const di=dayIntake(dd); if(di>0||dd.steps>0||dd.sport){ sumDef+=dayDeficit(dd); n++; } });
+  const lostKg = sumDef/CONFIG.kcalPerKg;
+  const pct=Math.max(0,Math.min(100, lostKg/DB.profile.goalKg*100));
+  $("#track").style.width=pct+"%";
+  $("#lostKg").textContent = lostKg.toFixed(2)+" kg verildi";
+  $("#goalKg").textContent = DB.profile.goalKg+" kg";
+  $("#goalSub").textContent = `${DB.profile.goalDays} günde ${DB.profile.goalKg} kg — günde ~${need} kcal açık gerekir`;
+  $("#stToday").textContent=(def>=0?"+":"")+def;
+  $("#stAvg").textContent= n? Math.round(sumDef/n) : 0;
+  $("#stDays").textContent=n;
+
+  // history
+  const hc=$("#histCard"); hc.innerHTML="";
+  const recent=keys.slice().reverse().slice(0,10).filter(k=>{const dd=DB.days[k];return dayIntake(dd)>0||dd.steps>0||dd.sport;});
+  if(recent.length===0){ hc.innerHTML='<div class="hd"><span style="color:var(--muted)">Henüz kayıt yok</span></div>'; }
+  else recent.forEach(k=>{
+    const dd=DB.days[k]; const di=dayDeficit(dd);
+    const d=new Date(k);
+    const hd=ce("div","hd");
+    hd.innerHTML=`<div class="hdate">${d.getDate()}.${d.getMonth()+1}<small> ${dayIntake(dd)} alındı · ${dayBurn(dd)} yakıldı</small></div>
+      <div class="hdef ${di>=0?'pos':'neg'} num">${di>=0?'+':''}${di}</div>`;
+    hc.appendChild(hd);
+  });
+
+  persist();
+}
+
+/* ---------- EVENTS ---------- */
+$("#steps").addEventListener("input",()=>{ curDay().steps=parseInt($("#steps").value)||0; $("#stepKc").textContent="+"+stepKcal(curDay())+" kcal"; render(); });
+$("#sportMin").addEventListener("input",()=>{ curDay().sportMin=parseInt($("#sportMin").value)||0; render(); });
+$("#prevDay").onclick=()=>{ cursor.setDate(cursor.getDate()-1); render(); };
+$("#nextDay").onclick=()=>{ if(dayKey(cursor)<dayKey(new Date())){ cursor.setDate(cursor.getDate()+1); render(); } };
+
+// settings
+function openSheet(){
+  const p=DB.profile;
+  $("#setName").value=p.name||""; $("#setWeight").value=p.weight; $("#setHeight").value=p.height;
+  $("#setAge").value=p.age; $("#setSex").value=p.sex; $("#setGoal").value=p.goalKg; $("#setDays").value=p.goalDays;
+  $("#bmrNote").textContent=`Hesaplanan bazal metabolizma: ${Math.round(bmr())} kcal. Günlük temel yakım (×${CONFIG.neatFactor}): ${Math.round(bmr()*CONFIG.neatFactor)} kcal.`;
+  $("#settingsSheet").classList.add("show");
+}
+$("#openSettings").onclick=openSheet;
+$("#settingsSheet").onclick=(e)=>{ if(e.target.id==="settingsSheet") $("#settingsSheet").classList.remove("show"); };
+$("#saveSettings").onclick=()=>{
+  const p=DB.profile;
+  p.name=$("#setName").value.trim();
+  p.weight=parseFloat($("#setWeight").value)||p.weight;
+  p.height=parseFloat($("#setHeight").value)||p.height;
+  p.age=parseInt($("#setAge").value)||p.age;
+  p.sex=$("#setSex").value;
+  p.goalKg=parseFloat($("#setGoal").value)||p.goalKg;
+  p.goalDays=parseInt($("#setDays").value)||p.goalDays;
+  persist(); $("#settingsSheet").classList.remove("show"); render();
+};
+$("#resetDay").onclick=()=>{ if(confirm("Bu günün tüm kayıtları silinsin mi?")){ DB.days[dayKey(cursor)]=blankDay(); persist(); $("#settingsSheet").classList.remove("show"); render(); } };
+
+render();
+</script>
+</body>
+</html>
